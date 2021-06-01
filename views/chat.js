@@ -43,6 +43,6 @@ export default function createChat() {
         removeUser: removeUser,
         addUser: addUser,
         state: state,
-        addMessage: addMessage
+        addMessage: addMessage,
     }
 }

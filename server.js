@@ -24,12 +24,24 @@ sockets.on('connection', (socket) => {
    }
 
    sockets.emit('setup', {userId, chat}); 
-
+   
    socket.on("disconnect", (reason) => {
       console.log('\n> Usuario desconectado: ' + userId +'\n')
       chat.removeUser({ userId });
 
-    });
+      sockets.emit('userDisconnect', {userId, chat})
+   });
+
+   socket.on('sendMessage', (stats) => {
+      console.log('> ENVIANDO MENSAGEM')
+      if(stats.msg != '') {
+         var messageContent = stats.msg
+         sockets.emit('newMessage', { messageContent, userId }); 
+      } else {
+         console.log('> MENSAGEM VAZIA CANCELANDO ENVIO');
+      }
+
+   })
 })
 
 server.listen(4567, () => {

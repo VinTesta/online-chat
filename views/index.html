@@ -10,6 +10,26 @@
 
     <title>Chat</title>
     <script src="/socket.io/socket.io.js"></script>
+    <style>
+        #myMessage {
+            background-color: rgb(154, 189, 186);
+        }
+
+        #newUserLog {
+            background-color: rgb(188, 190, 149);
+        }
+
+        #sendGroup {
+            position: fixed;
+        }
+
+        .scrollspy-example {
+            position: relative;
+            height: 100%;
+            overflow: auto;
+        }
+
+    </style>
   </head>
   <body>
 
@@ -18,25 +38,19 @@
             <div class="col-md-6 bg-secondary" style="height: 100vh">
                 <div class="row">
                     <div class="col-md-12">
-                        <div id="divUser"></div>
+                        <div id="divUser" style="height: 50px"></div>
                     </div>
                 </div>
-                <div class="row" id="divMessages" style="height: 85%;">
-                    <div class="col-md-12">
-                        <div class="row" style="height: auto;">
-                            <div class="bg-light col-md-6">
-                                <h4>Nome do user</h4>
-                                <p>Texto da mensagem oiasjdoajdjoiajsodjoa ijsdiojaoijdoiajiodjaiojdoijaosidji aojdioajiodjoaijdoiajiodjaiojsiodj aoijdioajsdjoajdsio</p>
-                            </div>
-                        </div>
+                <div class="row mb-2" id="divMessages" style="height: 80%;">
+                    <div class="col-md-12 p-3 scrollspy-example" id="colMessages" data-bs-spy="scroll" data-bs-target="#navbar-example2" data-bs-offset="0" tabindex="0">
                     </div>
                     
                 </div>
                 <div class="row">
-                    <div class="col-md-10">
+                    <div class="col-9">
                         <input type="text" id="inputMessage" placeholder="Digite a mensagem..." class="form-control">
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-2">
                         <button class="btn btn-primary" id="btnSendMessage">Enviar</button>
                     </div>
                 </div>
@@ -46,23 +60,63 @@
       
    
     <script type="module">
-        import createChat from './chat.js';
+        // import createChat from './chat.js';
+        import message from './message.js';
 
-        const chat = createChat();
         const socket = io()
+        const messageFunc = message()
 
-        function geraMensagem(infoMessage) {
-            var newMessage = '';
-
-            newMessage = "<div class='row bg-light'>"+infoMessage+"</div>";
-        }
-
-        socket.on('connect', () => {
+        const myUserId = socket.on('connect', () => {
             const userId = socket.id
+            return userId;
         });
 
+        // LOG DE CONEXÃO DE USUARIO
         socket.on('setup', (stats) => {
-            console.log('> Usuario ' + stats.userId + ' se conectou')
+            messageFunc.geraMessage().messageTypes.userLog({ message: { messageText: 'Usuario conectado: ', messageUserId: stats.userId, messageHour: '19:50:10'}, typeMessage: 'userLog'})
+            var windowScroll = document.getElementsByClassName("scrollspy-example")[0];
+            windowScroll.scrollTop = windowScroll.scrollHeight
+        })
+
+        document.getElementById("btnSendMessage").addEventListener('click', () => {
+            var msg = document.getElementById("inputMessage").value
+            socket.emit('sendMessage', {msg}); 
+
+            document.getElementById("inputMessage").value = ''
+        }) 
+
+        document.addEventListener('keypress', (e) => {
+            if(e.which == 13) {
+                var msg = document.getElementById("inputMessage").value
+                socket.emit('sendMessage', {msg}); 
+
+                document.getElementById("inputMessage").value = ''
+            }
+        })
+
+        socket.on('newMessage', (stats) => {
+            var typeMessage = '';
+            var windowScroll = document.getElementsByClassName("scrollspy-example")[0];
+            var receivedMessage = '';
+            var messageBody = document.createElement('div')
+
+            if(stats.userId != myUserId.id) {
+                receivedMessage = messageFunc.geraMessage().messageTypes.userMessage({ message: { messageText: stats.messageContent, messageUserId: stats.userId, messageHour: '19:50:10'}, typeMessage})
+            } else {
+                receivedMessage = messageFunc.geraMessage().messageTypes.myUserMessage({ message: { messageText: stats.messageContent, messageUserId: stats.userId, messageHour: '19:50:10'}, typeMessage})
+            }
+            messageBody.innerHTML = receivedMessage;
+
+            document.getElementById("colMessages").appendChild(messageBody);
+
+            windowScroll.scrollTop = windowScroll.scrollHeight
+        })
+
+        // LOG DE DESCONEXÃO DE USUARIO
+        socket.on('userDisconnect', (stats) => {
+            messageFunc.geraMessage().messageTypes.userLog({ message: { messageText: 'Usuario desconectado: ', messageUserId: stats.userId, messageHour: '19:50:10'}, typeMessage: 'userLog'})
+            var windowScroll = document.getElementsByClassName("scrollspy-example")[0];
+            windowScroll.scrollTop = windowScroll.scrollHeight
         })
 
     </script>
