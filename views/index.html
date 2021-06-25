@@ -38,7 +38,9 @@
             <div class="col-md-6 bg-secondary" style="height: 100vh">
                 <div class="row">
                     <div class="col-md-12">
-                        <div id="divUser" style="height: 50px"></div>
+                        <div id="divUser" style="height: 50px">
+                            <h2 class="text-center">Chat</h2>
+                        </div>
                     </div>
                 </div>
                 <div class="row mb-2" id="divMessages" style="height: 80%;">
@@ -50,7 +52,7 @@
                     <div class="col-9">
                         <input type="text" id="inputMessage" placeholder="Digite a mensagem..." class="form-control">
                     </div>
-                    <div class="col-2">
+                    <div class="col-3">
                         <button class="btn btn-primary" id="btnSendMessage">Enviar</button>
                     </div>
                 </div>
@@ -60,7 +62,6 @@
       
    
     <script type="module">
-        // import createChat from './chat.js';
         import message from './message.js';
 
         const socket = io()

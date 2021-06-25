@@ -33,12 +33,12 @@ sockets.on('connection', (socket) => {
    });
 
    socket.on('sendMessage', (stats) => {
-      console.log('> ENVIANDO MENSAGEM')
+      console.log('\n\n> ENVIANDO MENSAGEM')
       if(stats.msg != '') {
          var messageContent = stats.msg
          sockets.emit('newMessage', { messageContent, userId }); 
       } else {
-         console.log('> MENSAGEM VAZIA CANCELANDO ENVIO');
+         console.log('\n> MENSAGEM VAZIA CANCELANDO ENVIO');
       }
 
    })
@@ -46,7 +46,7 @@ sockets.on('connection', (socket) => {
 
 server.listen(4567, () => {
 
-   console.log('> ABRINDO SERVIDOR...')
+   console.log('\n> ABRINDO SERVIDOR...')
 });
 
 app.listen(3000)
